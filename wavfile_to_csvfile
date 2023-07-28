@@ -1,0 +1,44 @@
+import os
+import pandas as pd
+import re
+
+name = []
+fold_name = []
+class_na = []
+
+def search(dirname):
+  i = 0
+  try:
+    filenames = os.listdir(dirname)
+    for filename in filenames:
+      full_filename = os.path.join(dirname, filename)
+      if os.path.isdir(full_filename):
+        search(full_filename) ## 재귀호출
+      else:
+        ext = os.path.splitext(full_filename)[-1]
+        if ext == ".wav":
+          print(full_filename)
+          nfile = re.sub(r" (\d+)", "", filename)
+          nfile = re.sub(r"label.wav", "", nfile)
+          print(nfile)
+          name.append(filename)
+          fold_name.append(nfile)
+          class_na.append('class 이름지정')
+  except PermissionError:
+    pass
+
+search("csv로 추출할 wav파일(폴더)의 경로")
+
+print(name)
+print(fold_name)
+print(class_na)
+
+test_data = pd.DataFrame()
+test_data['fold'] = fold_name
+test_data['slice_file_name'] = name
+test_data['class_name'] = class_na
+
+test_data.index = range(1, len(test_data)+1)
+print(test_data)
+
+test_data.to_csv("최종 저장될 경로와 파일명 지정.csv", encoding='utf-8-sig', index=False) #파일명끝에 .csv 붙여서 확장자 지정할것
